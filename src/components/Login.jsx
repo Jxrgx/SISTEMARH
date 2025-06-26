@@ -1,8 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { signInWithPopup } from "firebase/auth";
-import { auth, provider } from "../firebase-config"; // Ojo: subimos un nivel porque está fuera de components
+import { auth, provider } from "../firebase-config";
+import { useAuth } from "../AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
+
   const handleGoogleLogin = () => {
     signInWithPopup(auth, provider)
       .then((result) => {
