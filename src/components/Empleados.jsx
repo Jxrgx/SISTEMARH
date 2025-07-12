@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { db } from "../firebase-config";
 import { collection, getDocs, addDoc } from "firebase/firestore";
+import { deleteDoc, doc } from "firebase/firestore";
 
 const Empleados = () => {
   const [empleados, setEmpleados] = useState([]);
@@ -32,6 +33,19 @@ const Empleados = () => {
     obtenerEmpleados();
   };
 
+  const eliminarEmpleado = async (id) => {
+  const confirmacion = window.confirm("¿Estás seguro de que deseas eliminar este empleado?");
+  if (!confirmacion) return;
+
+  try {
+    const empleadoRef = doc(db, "empleados", id);
+    await deleteDoc(empleadoRef);
+    obtenerEmpleados(); 
+  } catch (error) {
+    console.error("Error al eliminar el empleado:", error);
+    alert("Ocurrió un error al eliminar. Intenta de nuevo.");
+  }
+};
   return (
     <div className="p-4">
       <h1 className="text-xl font-bold mb-4">Lista de Empleados</h1>
@@ -64,12 +78,22 @@ const Empleados = () => {
       </form>
 
       <ul className="space-y-2">
-        {empleados.map((empleado) => (
-          <li key={empleado.id} className="border p-2 rounded">
-            <strong>{empleado.nombre}</strong> - {empleado.puesto} - {empleado.correo}
-          </li>
-        ))}
-      </ul>
+        
+  {empleados.map((empleado) => (
+    <li key={empleado.id} className="border p-2 rounded flex justify-between items-center">
+      <div>
+        <strong>{empleado.nombre}</strong> - {empleado.puesto} - {empleado.correo}
+      </div>
+      <button
+        onClick={() => eliminarEmpleado(empleado.id)}
+        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
+      >
+        Eliminar
+      </button>
+    </li>
+  ))}
+</ul>
+
     </div>
   );
 };
